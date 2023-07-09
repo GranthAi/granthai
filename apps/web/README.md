@@ -1,2 +1,2 @@
-# GranthAi-ui
+# GranthAi UI
 Frontend for GranthAi
