@@ -35,7 +35,7 @@ export default function Home() {
 	});
 
 	const handleClick = () => {
-		window.open("https://tally.so/r/3qDAgg", "_blank");
+		window.open("/signup", "_blank");
 	};
 
 	const handleSocialClick = (url) => {
