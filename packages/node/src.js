@@ -1,7 +1,7 @@
 const generateSchema = require("./schemaGenerator");
 const swaggerTemplate = require("./swaggerTemplate");
 
-const jsonData = {
+var jsonData = {
 	openapi: "3.0.0",
 	info: {
 		title: "Example API",
@@ -11,9 +11,9 @@ const jsonData = {
 	paths: {}
 };
 
-const FUNC_REGISTERED = false;
+var FUNC_REGISTERED = false;
 
-async function GranthAi({ docTitle, key, baseUrl }) {
+function GranthAi({ docTitle, baseUrl, key }) {
 	jsonData.info.title = docTitle || "API Documentation";
 	if (baseUrl && baseUrl.length > 0) {
 		jsonData.servers.push({ url: baseUrl, description: `${docTitle} server` });
@@ -24,7 +24,7 @@ async function GranthAi({ docTitle, key, baseUrl }) {
 		FUNC_REGISTERED = true;
 	}
 
-	return function (req, res, next) {
+	return async function (req, res, next) {
 		const send = res.json;
 		let firstpass = false;
 
@@ -42,9 +42,8 @@ async function GranthAi({ docTitle, key, baseUrl }) {
 				if (paramsLength > 0) {
 					path = path.split("/");
 					const params = req.params;
-					console.log(path);
 					for (let i = 0; i < path.length; i++) {
-						for (obj in params) {
+						for (const obj in params) {
 							if (path[i] === params[obj]) {
 								path[i] = "{" + obj + "}";
 							}
@@ -117,7 +116,6 @@ async function GranthAi({ docTitle, key, baseUrl }) {
 						for (const a of jsonData.paths[path][method].parameters) {
 							if (a.name === p.name && a.in === "query") {
 								found = true;
-								console.log("found");
 							}
 						}
 						if (!found) {
@@ -161,9 +159,9 @@ async function GranthAi({ docTitle, key, baseUrl }) {
 					};
 				}
 
-				// fs.writeFile("./openapi.json", JSON.stringify(jsonData), (err) => {
-				// 	console.log("Written data");
-				// });
+				fs.writeFile("./openapi.json", JSON.stringify(jsonData), (err) => {
+					//console.log("Written data");
+				});
 			}
 			send.call(this, body);
 		};

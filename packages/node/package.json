@@ -1,11 +1,10 @@
 {
 	"name": "granthai",
-	"version": "1.1.12",
+	"version": "1.2.0",
 	"description": "Nodejs package to generate automatic API documentation",
 	"main": "index.js",
 	"files": [
 		"dist/index.js",
-		"package.json",
 		"README.md"
 	],
 	"scripts": {
@@ -27,7 +26,7 @@
 		"documentation",
 		"generator"
 	],
-	"dependencies": {
+	"devDependencies": {
 		"@rollup/plugin-commonjs": "^25.0.3",
 		"@rollup/plugin-json": "^6.0.0",
 		"@rollup/plugin-node-resolve": "^15.1.0",

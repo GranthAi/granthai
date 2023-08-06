@@ -23,8 +23,11 @@ Absolutely, this tool is completely free to use.
 - This information is solely utilized for auditing purposes, service enhancement, and gaining insight into user requirements. 
 - If you choose to subscribe to our upcoming features like API metrics & monitoring, live hosting, automated testing, error tracking, and more, we might consider storing such data then.
 
+## Support and feedback
+- manage.granthai@gmail.com
+
 ### Authors
-- Omkar Ajagunde <ajagundeomkar@gmail.com> (http://omkarajagunde.web.app/), 
-- Sanket Chaudhari <clasac119@gmail.com> (https://github.com/sanketssc)
+- Omkar Ajagunde (http://omkarajagunde.web.app/), 
+- Sanket Chaudhari (https://github.com/sanketssc)
 
 
