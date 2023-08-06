@@ -1,11 +1,16 @@
 {
 	"name": "granthai",
-	"version": "1.1.10",
+	"version": "1.1.12",
 	"description": "Nodejs package to generate automatic API documentation",
 	"main": "index.js",
+	"files": [
+		"dist/index.js",
+		"package.json",
+		"README.md"
+	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"publish": "npm publish"
+		"build-and-publish": "rollup -c && npm publish"
 	},
 	"author": "Omkar Ajagunde <ajagundeomkar@gmail.com> (http://omkarajagunde.web.app/), Sanket Chaudhari <clasac119@gmail.com> (https://github.com/sanketssc)",
 	"license": "MIT",

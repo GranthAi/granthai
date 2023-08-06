@@ -4,10 +4,10 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { obfuscator } from "rollup-obfuscator";
 
 export default {
-	input: "index.js",
+	input: "src.js",
 	output: [
 		{
-			file: "dist/index.js",
+			file: "index.js",
 			format: "cjs",
 			inlineDynamicImports: true
 		}
