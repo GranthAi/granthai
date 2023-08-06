@@ -1,10 +1,8 @@
 import Head from "next/head";
 import { Montserrat } from "next/font/google";
 import styles from "@/styles/Home.module.scss";
-import { useEffect, useState, useRef } from "react";
-import Script from "next/script";
-import HorizontalScroll from "react-scroll-horizontal";
-import ScrollSection from "@/components/ScrollSection";
+import { useState, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Montserrat({
 	subsets: ["latin"],
@@ -61,6 +59,7 @@ export default function Home() {
 				<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 				<link rel="manifest" href="/site.webmanifest" />{" "}
 			</Head>
+			<Analytics />
 			<main className={`${styles.main} ${inter.className}`}>
 				<div className={styles.heroSection}>
 					<div className={styles.left}>
