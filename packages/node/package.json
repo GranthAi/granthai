@@ -1,6 +1,6 @@
 {
 	"name": "granthai",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "Nodejs package to generate automatic API documentation",
 	"main": "index.js",
 	"files": [

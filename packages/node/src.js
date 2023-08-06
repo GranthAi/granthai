@@ -1,5 +1,6 @@
 const generateSchema = require("./schemaGenerator");
 const swaggerTemplate = require("./swaggerTemplate");
+const fs = require("fs");
 
 var jsonData = {
 	openapi: "3.0.0",
