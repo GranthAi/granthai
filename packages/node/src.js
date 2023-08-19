@@ -41,7 +41,7 @@ function GranthAi({ docTitle, baseUrl, key }) {
 		}
 
 		mixpanel.track("granthai-node-middleware", {
-			distinct_id: baseUrl,
+			distinct_id: baseUrl || req.get("host"),
 			route: req.originalUrl
 		});
 
