@@ -1,6 +1,6 @@
 {
 	"name": "granthai",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Nodejs package to generate automatic API documentation",
 	"main": "index.js",
 	"files": [
@@ -32,5 +32,8 @@
 		"@rollup/plugin-node-resolve": "^15.1.0",
 		"rollup": "^3.27.2",
 		"rollup-obfuscator": "^3.0.2"
+	},
+	"dependencies": {
+		"mixpanel": "^0.17.0"
 	}
 }

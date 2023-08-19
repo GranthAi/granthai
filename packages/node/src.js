@@ -1,6 +1,11 @@
 const generateSchema = require("./schemaGenerator");
 const swaggerTemplate = require("./swaggerTemplate");
+const mixpanel = require("mixpanel");
 const fs = require("fs");
+
+var Mixpanel = require("mixpanel");
+
+var mixpanel = Mixpanel.init("f33b80a16f963e03c771000a4477972a");
 
 var jsonData = {
 	openapi: "3.0.0",
@@ -24,6 +29,11 @@ function GranthAi({ docTitle, baseUrl, key }) {
 		console.log("[GranthAi] Please help us improve the service by signing up here - https://granthai.com/");
 		FUNC_REGISTERED = true;
 	}
+
+	mixpanel.track("GranthAi-node-middleware", {
+		distinct_id: req.baseUrl,
+		route: req.originalUrl
+	});
 
 	return async function (req, res, next) {
 		const send = res.json;
