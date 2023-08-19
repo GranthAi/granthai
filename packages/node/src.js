@@ -28,11 +28,6 @@ function GranthAi({ docTitle, baseUrl, key }) {
 		FUNC_REGISTERED = true;
 	}
 
-	mixpanel.track("GranthAi-node-middleware", {
-		distinct_id: req.baseUrl,
-		route: req.originalUrl
-	});
-
 	return async function (req, res, next) {
 		const send = res.json;
 		let firstpass = false;
@@ -40,6 +35,11 @@ function GranthAi({ docTitle, baseUrl, key }) {
 		if (req.path.includes("/api-docs")) {
 			return res.send(swaggerTemplate(jsonData));
 		}
+
+		mixpanel.track("GranthAi-node-middleware", {
+			distinct_id: req.baseUrl,
+			route: req.originalUrl
+		});
 
 		res.json = function (body) {
 			if (!firstpass) {
