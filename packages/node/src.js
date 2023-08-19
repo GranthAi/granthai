@@ -1,10 +1,8 @@
 const generateSchema = require("./schemaGenerator");
 const swaggerTemplate = require("./swaggerTemplate");
-const mixpanel = require("mixpanel");
 const fs = require("fs");
 
 var Mixpanel = require("mixpanel");
-
 var mixpanel = Mixpanel.init("f33b80a16f963e03c771000a4477972a");
 
 var jsonData = {
