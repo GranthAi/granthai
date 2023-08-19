@@ -9,6 +9,8 @@ app.use(GranthAi({
     baseUrl: "..."  // optional
 }))
 ```
+Note: If you use nodemon on your server, put `openapi.json` (this file is created at the level of server entry point file) to nodemon ignore else documentation will not show up
+
 
 ### How to access the generated API Documentation?
 When the NodeJs server starts up, GranthAi will add a new public route to your server url at `/api-docs`, you can simply visit this `/api-docs` route to access your generated API Documentation
