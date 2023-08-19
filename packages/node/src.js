@@ -18,6 +18,10 @@ var jsonData = {
 var FUNC_REGISTERED = false;
 
 function GranthAi({ docTitle, baseUrl, key }) {
+	if (!baseUrl || baseUrl.length < 5) {
+		console.error("[GranthAi] Server baseUrl key not provided!...");
+	}
+
 	jsonData.info.title = docTitle || "API Documentation";
 	if (baseUrl && baseUrl.length > 0) {
 		jsonData.servers.push({ url: baseUrl, description: `${docTitle} server` });
@@ -36,8 +40,8 @@ function GranthAi({ docTitle, baseUrl, key }) {
 			return res.send(swaggerTemplate(jsonData));
 		}
 
-		mixpanel.track("GranthAi-node-middleware", {
-			distinct_id: req.baseUrl,
+		mixpanel.track("granthai-node-middleware", {
+			distinct_id: baseUrl,
 			route: req.originalUrl
 		});
 

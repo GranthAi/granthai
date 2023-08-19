@@ -6,7 +6,7 @@ const app = express()
 app.use(GranthAi({ 
     docTitle: "..." // optional
     key: "..."      // optional
-    baseUrl: "..."  // optional
+    baseUrl: "..."  // required
 }))
 ```
 Note: If you use nodemon on your server, put `openapi.json` (this file is created at the level of server entry point file) to nodemon ignore else documentation will not show up
