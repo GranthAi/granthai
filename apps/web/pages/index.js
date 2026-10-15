@@ -1,12 +1,13 @@
 import Head from "next/head";
-import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import styles from "@/styles/Home.module.scss";
 import { useState, useRef } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
-const inter = Montserrat({
-	subsets: ["latin"],
-	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
+// Self-hosted Montserrat (variable, weights 100-900) so builds don't depend on reaching Google Fonts
+const inter = localFont({
+	src: "../node_modules/@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2",
+	weight: "100 900"
 });
 
 export default function Home() {

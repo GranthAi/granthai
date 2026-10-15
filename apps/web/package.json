@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fontsource-variable/montserrat": "5.2.8",
     "@vercel/analytics": "^1.0.1",
     "framer-motion": "1.11.1",
     "gsap": "3.10.4",

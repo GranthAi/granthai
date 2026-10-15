@@ -111,6 +111,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@fontsource-variable/montserrat':
+        specifier: 5.2.8
+        version: 5.2.8
       '@vercel/analytics':
         specifier: ^1.0.1
         version: 1.6.1(next@13.4.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.105.1))(react@18.2.0)
@@ -190,6 +193,9 @@ packages:
 
   '@emotion/memoize@0.7.4':
     resolution: {integrity: sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==}
+
+  '@fontsource-variable/montserrat@5.2.8':
+    resolution: {integrity: sha512-d8wykq7GCKhEOlLwEuQIOK3w3qsXNxwDlH0meru4AZZzQ4/+rZyvHWKL6BBtHdmbovSHEEQDkwkD8qYUKlcFtQ==}
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1378,6 +1384,8 @@ snapshots:
 
   '@emotion/memoize@0.7.4':
     optional: true
+
+  '@fontsource-variable/montserrat@5.2.8': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
