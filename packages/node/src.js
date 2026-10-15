@@ -1,12 +1,14 @@
 const generateSchema = require("./schemaGenerator");
 const swaggerTemplate = require("./swaggerTemplate");
+const handleMcpRequest = require("./mcpServer");
 const fs = require("fs");
+const { STATUS_CODES } = require("http");
 
 var Mixpanel = require("mixpanel");
 var mixpanel = Mixpanel.init("f33b80a16f963e03c771000a4477972a");
 
 var jsonData = {
-	openapi: "3.0.0",
+	openapi: "3.1.0",
 	info: {
 		title: "Example API",
 		version: "1.0.0"
@@ -17,7 +19,15 @@ var jsonData = {
 
 var FUNC_REGISTERED = false;
 
-function GranthAi({ docTitle, baseUrl, key }) {
+function safeDecode(segment) {
+	try {
+		return decodeURIComponent(segment);
+	} catch (err) {
+		return segment;
+	}
+}
+
+function GranthAi({ docTitle, baseUrl, key, mcp = true, mcpAllowedOrigins = [] }) {
 	if (!baseUrl || baseUrl.length < 5) {
 		console.error("[GranthAi] Server baseUrl key not provided!...");
 	}
@@ -40,6 +50,10 @@ function GranthAi({ docTitle, baseUrl, key }) {
 			return res.send(swaggerTemplate(jsonData));
 		}
 
+		if (mcp && (req.path === "/mcp-server" || req.path === "/mcp-server/")) {
+			return handleMcpRequest(req, res, { spec: jsonData, baseUrl, allowedOrigins: mcpAllowedOrigins });
+		}
+
 		mixpanel.track("granthai-node-middleware", {
 			distinct_id: baseUrl || req.get("host"),
 			route: req.originalUrl
@@ -50,14 +64,14 @@ function GranthAi({ docTitle, baseUrl, key }) {
 				firstpass = true;
 				const status = res.statusCode;
 				const paramsLength = Object.keys(req.params).length;
-				let path = req.originalUrl;
+				let path = req.originalUrl.split("?")[0];
 
 				if (paramsLength > 0) {
 					path = path.split("/");
 					const params = req.params;
 					for (let i = 0; i < path.length; i++) {
 						for (const obj in params) {
-							if (path[i] === params[obj]) {
+							if (path[i] === params[obj] || safeDecode(path[i]) === params[obj]) {
 								path[i] = "{" + obj + "}";
 							}
 						}
@@ -70,21 +84,11 @@ function GranthAi({ docTitle, baseUrl, key }) {
 				}
 				const method = req.method.toLowerCase();
 				if (!jsonData.paths[path][method]) {
-					if (method === "get" || method === "delete") {
-						jsonData.paths[path][method] = {
-							summary: "",
-							parameters: [],
-							responses: {}
-						};
-					}
-					if (method === "post" || method === "put" || method === "patch") {
-						jsonData.paths[path][method] = {
-							summary: "",
-							parameters: [],
-							requestBody: { content: {} },
-							responses: {}
-						};
-					}
+					jsonData.paths[path][method] = {
+						summary: "",
+						parameters: [],
+						responses: {}
+					};
 				}
 				if (req.params) {
 					const params = req.params;
@@ -97,7 +101,7 @@ function GranthAi({ docTitle, baseUrl, key }) {
 								type: "string"
 							}
 						};
-						if (typeof parseInt(params[obj]) === "number") {
+						if (/^-?\d+$/.test(params[obj])) {
 							p.schema.type = "integer";
 						}
 						let found = false;
@@ -122,7 +126,7 @@ function GranthAi({ docTitle, baseUrl, key }) {
 							},
 							description: ""
 						};
-						if (typeof parseInt(params[obj]) === "number") {
+						if (/^-?\d+$/.test(params[obj])) {
 							p.schema.type = "integer";
 						}
 						let found = false;
@@ -137,40 +141,29 @@ function GranthAi({ docTitle, baseUrl, key }) {
 					}
 				}
 
-				const reqContentType = req.headers["content-type"];
+				const reqContentType = (req.headers["content-type"] || "").split(";")[0].trim();
 				const data = req.body;
 
-				if (method === "post" || method === "put" || method === "patch") {
-					jsonData.paths[path][method].requestBody.content[reqContentType] = {
+				if ((method === "post" || method === "put" || method === "patch") && reqContentType && data !== undefined) {
+					const operation = jsonData.paths[path][method];
+					if (!operation.requestBody) {
+						operation.requestBody = { required: false, content: {} };
+					}
+					operation.requestBody.content[reqContentType] = {
 						schema: generateSchema(data)
-					}; //add schema instead of data later
-					//handle case for true
-					jsonData.paths[path][method].requestBody["required"] = false;
+					};
 				}
 
 				if (!jsonData.paths[path][method].responses[status]) {
 					jsonData.paths[path][method].responses[status] = {
-						description: "",
+						description: STATUS_CODES[status] || "",
 						content: {}
 					};
 				}
-				let resContentType;
-				if (typeof body === "object") {
-					resContentType = "application/json";
-					jsonData.paths[path][method].responses[status].content[resContentType] = {
-						schema: generateSchema(body)
-					};
-				} else if (typeof body === "string") {
-					resContentType = "text/plain";
-					jsonData.paths[path][method].responses[status].content[resContentType] = {
-						schema: { type: "string" }
-					};
-				} else {
-					resContentType = "string";
-					jsonData.paths[path][method].responses[status].content[resContentType] = {
-						schema: { type: "string" }
-					};
-				}
+				// res.json() always sends JSON, whatever the type of body
+				jsonData.paths[path][method].responses[status].content["application/json"] = {
+					schema: generateSchema(body)
+				};
 
 				fs.writeFile("./openapi.json", JSON.stringify(jsonData), (err) => {
 					//console.log("Written data");

@@ -1,43 +1,37 @@
-// const data = require('./example-api copy.json')
-// const schema = {}
-// console.log(data)
-
-// console.log(Array.isArray(data.paths['/users'].get.parameters))
+// Infers a JSON Schema (2020-12, as used by OpenAPI 3.1) from a sample value
 function generateSchema(data) {
-	const sch = {};
-
-	let type = typeof data;
+	if (data === null) {
+		return { type: "null" };
+	}
 	if (Array.isArray(data)) {
-		type = "array";
+		// An empty array tells us nothing about its items, so leave them unconstrained
+		return data.length > 0 ? { type: "array", items: generateSchema(data[0]) } : { type: "array" };
 	}
-	sch.type = type;
-	if (type === "object") {
-		data = JSON.parse(JSON.stringify(data));
-		sch.properties = {};
-		for (const obj in data) {
-			let type = typeof data[obj];
-			if (Array.isArray(data[obj])) {
-				type = "array";
+
+	switch (typeof data) {
+		case "object": {
+			const properties = {};
+			for (const key in data) {
+				if (data[key] !== undefined) {
+					properties[key] = generateSchema(data[key]);
+				}
 			}
-			let tempSchema = {};
-			if (type === "object") {
-				tempSchema = generateSchema(data[obj]);
-				sch["properties"][obj] = tempSchema;
-			} else if (type === "array") {
-				tempSchema = generateSchema(data[obj][0]);
-				sch["properties"][obj] = { type: type, items: tempSchema };
-			} else {
-				sch["properties"][obj] = { type: type };
-			}
+			return { type: "object", properties };
 		}
-	} else if (type === "array") {
-		sch.items = generateSchema(data[0]);
+		case "number":
+			return { type: Number.isInteger(data) ? "integer" : "number" };
+		case "string":
+		case "boolean":
+			return { type: typeof data };
+		default:
+			// undefined, functions, etc. have no JSON representation
+			return {};
 	}
-	return sch;
 }
 
-// const schema = generateSchema(data)
-// // console.log(JSON.stringify(schema))
-// const fs = require('fs');
-// fs.writeFile('./generatedSchema.json',JSON.stringify(schema), ()=>{})
-module.exports = generateSchema;
+// Normalize through JSON first so Dates, Mongoose documents and other toJSON() values
+// are described the way res.json() actually serializes them
+module.exports = function (data) {
+	const json = JSON.stringify(data);
+	return generateSchema(json === undefined ? undefined : JSON.parse(json));
+};

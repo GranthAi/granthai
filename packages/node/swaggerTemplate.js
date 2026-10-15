@@ -2,7 +2,7 @@ module.exports = function (jsonData) {
 	return `<html>
                 <head>
                     <meta charset="UTF-8">
-                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.19.5/swagger-ui.css" >
+                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.css" >
                     <style>
                     .topbar {
                         display: none;
@@ -12,8 +12,8 @@ module.exports = function (jsonData) {
 
                 <body>
                     <div id="swagger-ui"></div>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.19.5/swagger-ui-bundle.js"> </script>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.19.5/swagger-ui-standalone-preset.js"> </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.js"> </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.js"> </script>
                     <script>
                     window.onload = function() {
                         const spec = ${JSON.stringify(jsonData)}

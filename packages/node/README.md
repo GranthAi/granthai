@@ -15,6 +15,21 @@ Note: If you use nodemon on your server, put `openapi.json` (this file is create
 ### How to access the generated API Documentation?
 When the NodeJs server starts up, GranthAi will add a new public route to your server url at `/api-docs`, you can simply visit this `/api-docs` route to access your generated API Documentation
 
+GranthAi generates an [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0) description (with JSON Schema 2020-12 schemas inferred from real requests and responses), saved as `openapi.json` and rendered with Swagger UI.
+
+
+### MCP server
+GranthAi also turns the same generated OpenAPI spec into an [MCP](https://modelcontextprotocol.io) server at `/mcp-server` (Streamable HTTP transport), so AI agents and MCP clients like Claude can call your API directly. Every endpoint in the spec is exposed as a tool (e.g. `GET /users/{id}` becomes `get_users_id`), and calling a tool makes the real HTTP request to your API using `baseUrl`.
+
+```bash
+claude mcp add --transport http my-api https://your-server.com/mcp-server
+```
+
+- Tools appear once an endpoint has handled at least one request, just like `/api-docs`
+- The `Authorization` header sent to `/mcp-server` is forwarded to your API, so your existing auth keeps applying
+- Browser requests from other origins are rejected unless listed in `mcpAllowedOrigins`
+- Disable it with `GranthAi({ ..., mcp: false })`
+
 
 ### Is it free to use? 
 
