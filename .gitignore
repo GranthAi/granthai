@@ -16,6 +16,7 @@ openapi.json
 # misc
 .DS_Store
 *.pem
+.env
 .env*.local
 .vercel
 npm-debug.log*
