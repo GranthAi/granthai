@@ -1,0 +1,10 @@
+{
+	"name": "granthai-monorepo",
+	"private": true,
+	"packageManager": "pnpm@12.3.4",
+	"scripts": {
+		"dev:web": "pnpm --filter @granthai/web dev",
+		"build:web": "pnpm --filter @granthai/web build",
+		"publish:node": "pnpm --filter granthai publish --access public"
+	}
+}

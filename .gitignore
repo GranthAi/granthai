@@ -1,0 +1,25 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# build output
+.next/
+out/
+build/
+dist/
+coverage/
+
+# written by the granthai middleware when running it locally
+openapi.json
+
+# misc
+.DS_Store
+*.pem
+.env*.local
+.vercel
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.cache
+.history/

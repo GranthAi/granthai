@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Dependency build scripts reviewed and not needed: esbuild comes from the vercel CLI
+# dependency and @parcel/watcher is only used by sass in watch mode
+allowBuilds:
+  esbuild: false
+  "@parcel/watcher": false
