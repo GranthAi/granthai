@@ -89,7 +89,7 @@ export default function Home() {
 						{/* <img src={"/js-snippet.png"} /> */}
 						<video autoPlay controls loop muted playsInline>
 							<source
-								src="https://github.com/omkarajagunde/granthai/assets/50138744/35d42210-307e-4cb8-a320-106b661b1593"
+								src="/granthai-agent-demo.mp4"
 								type="video/mp4"
 							/>
 						</video>
