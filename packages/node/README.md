@@ -26,9 +26,11 @@ claude mcp add --transport http my-api https://your-server.com/mcp-server
 ```
 
 - Tools appear once an endpoint has handled at least one request, just like `/api-docs`
-- The `Authorization` header sent to `/mcp-server` is forwarded to your API, so your existing auth keeps applying
+- The `Authorization`, `Cookie`, `X-CSRF-Token` and `X-XSRF-Token` headers sent to `/mcp-server` are forwarded to your API, so your existing auth (bearer tokens or sessions) keeps applying
 - Browser requests from other origins are rejected unless listed in `mcpAllowedOrigins`
 - Disable it with `GranthAi({ ..., mcp: false })`
+
+See it on a real app: [`examples/worklenz`](examples/worklenz) injects GranthAi into [Worklenz](https://github.com/Worklenz/worklenz), an open-source Jira/Asana alternative, so you can watch its API docs and MCP tools fill in as you use it.
 
 
 ### Is it free to use? 

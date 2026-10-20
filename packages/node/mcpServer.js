@@ -6,6 +6,9 @@ const { version } = require("./package.json");
 const SUPPORTED_PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26"];
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete"];
 const TOOL_CALL_TIMEOUT_MS = 30000;
+// Credentials an MCP client sends to /mcp-server that are passed on to the API, so cookie/session
+// based apps (and their CSRF checks) work the same as bearer-token ones
+const FORWARDED_HEADERS = ["authorization", "cookie", "x-csrf-token", "x-xsrf-token"];
 
 function toolNameFor(method, path) {
 	const slug = path
@@ -58,7 +61,7 @@ function buildTools(spec) {
 	return tools;
 }
 
-async function callTool(tool, args, { origin, authorization }) {
+async function callTool(tool, args, { origin, forwardedHeaders }) {
 	const { method, path, parameters, bodyContentType } = tool._operation;
 	let urlPath = path;
 	const query = new URLSearchParams();
@@ -78,8 +81,7 @@ async function callTool(tool, args, { origin, authorization }) {
 	const url = new URL(urlPath, origin);
 	url.search = query.toString();
 
-	const headers = { accept: "application/json, text/plain, */*" };
-	if (authorization) headers.authorization = authorization;
+	const headers = { accept: "application/json, text/plain, */*", ...forwardedHeaders };
 	let body;
 	if (args.body !== undefined && method !== "get" && method !== "delete") {
 		const contentType = bodyContentType && bodyContentType.includes("json") ? bodyContentType : "application/json";
@@ -195,7 +197,11 @@ async function handleMcpRequest(req, res, { spec, baseUrl, allowedOrigins = [] }
 	} catch (err) {
 		origin = `${req.protocol}://${req.get("host")}`;
 	}
-	const ctx = { spec, origin, authorization: req.get("authorization") };
+	const forwardedHeaders = {};
+	for (const name of FORWARDED_HEADERS) {
+		if (req.get(name)) forwardedHeaders[name] = req.get(name);
+	}
+	const ctx = { spec, origin, forwardedHeaders };
 
 	const messages = Array.isArray(payload) ? payload : [payload];
 	const responses = (await Promise.all(messages.map((message) => handleMessage(message, ctx)))).filter(Boolean);

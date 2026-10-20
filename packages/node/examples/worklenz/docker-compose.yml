@@ -1,0 +1,25 @@
+# Postgres for the Worklenz example. The backend itself runs on your machine (npm run dev)
+# so you can watch GranthAi pick up endpoints live. Schema comes from the cloned repo.
+name: granthai-worklenz
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: granthai
+      POSTGRES_DB: worklenz_db
+    ports:
+      - "55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d worklenz_db -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./worklenz/worklenz-backend/database/sql:/docker-entrypoint-initdb.d/sql:ro
+      - ./worklenz/worklenz-backend/database/00_init.sh:/docker-entrypoint-initdb.d/00_init.sh:ro
+
+volumes:
+  pgdata:

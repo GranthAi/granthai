@@ -1,0 +1,21 @@
+diff --git a/worklenz-backend/src/app.ts b/worklenz-backend/src/app.ts
+index 0e097e2d..9d768e3f 100644
+--- a/worklenz-backend/src/app.ts
++++ b/worklenz-backend/src/app.ts
+@@ -72,6 +72,16 @@ app.use(express.json({
+   },
+ }));
+ app.use(express.urlencoded({ extended: false, limit: "50mb" }));
++
++// GranthAi: documents every API call at /api-docs and exposes it as an MCP tool at /mcp-server.
++// Mounted before session/CSRF so /mcp-server is reachable; tool calls forward the caller's
++// Cookie and X-CSRF-Token headers, so Worklenz's own auth still applies to every request.
++// eslint-disable-next-line @typescript-eslint/no-var-requires
++const GranthAi = require("granthai");
++app.use(GranthAi({
++  docTitle: "Worklenz API",
++  baseUrl: process.env.GRANTHAI_BASE_URL || `http://localhost:${process.env.PORT || 3000}`,
++}));
+ app.use(cookieParser(process.env.COOKIE_SECRET));
+ app.use(globalRateLimiter);
+ app.use(hpp());
