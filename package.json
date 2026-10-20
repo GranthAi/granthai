@@ -5,6 +5,8 @@
 	"scripts": {
 		"dev:web": "pnpm --filter @granthai/web dev",
 		"build:web": "pnpm --filter @granthai/web build",
-		"publish:node": "pnpm --filter granthai publish --access public"
+		"publish:node": "pnpm --filter granthai publish --access public",
+		"test:agent": "pnpm --filter granthai-agent test",
+		"publish:agent": "pnpm --filter granthai-agent publish --access public"
 	}
 }

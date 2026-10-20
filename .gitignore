@@ -12,6 +12,8 @@ coverage/
 
 # written by the granthai middleware when running it locally
 openapi.json
+# written by granthai-agent
+granthai.openapi.json
 
 # misc
 .DS_Store

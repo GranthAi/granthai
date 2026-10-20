@@ -1,0 +1,52 @@
+{
+	"name": "granthai-agent",
+	"version": "0.1.0",
+	"description": "Language-agnostic GranthAi agent: a reverse proxy that generates OpenAPI 3.1 docs, Swagger UI and an MCP server from the live traffic of any HTTP API",
+	"main": "src/index.js",
+	"bin": {
+		"granthai-agent": "bin/granthai-agent.js"
+	},
+	"files": [
+		"bin",
+		"src",
+		"README.md"
+	],
+	"scripts": {
+		"start": "node bin/granthai-agent.js",
+		"test": "node --test test/*.test.js"
+	},
+	"author": "Omkar Ajagunde <ajagundeomkar@gmail.com> (http://omkarajagunde.web.app/), Sanket Chaudhari <clasac119@gmail.com> (https://github.com/sanketssc)",
+	"license": "MIT",
+	"homepage": "https://granthai.vercel.app",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GranthAi/granthai.git",
+		"directory": "packages/agent"
+	},
+	"bugs": {
+		"url": "https://github.com/GranthAi/granthai/issues"
+	},
+	"engines": {
+		"node": ">=18.17"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"access": "public"
+	},
+	"keywords": [
+		"api",
+		"documentation",
+		"generator",
+		"openapi",
+		"openapi-3.1",
+		"swagger",
+		"proxy",
+		"reverse-proxy",
+		"mcp",
+		"model-context-protocol",
+		"python",
+		"java",
+		"php",
+		"go"
+	]
+}
