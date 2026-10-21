@@ -15,12 +15,11 @@ export default function Home() {
 	const slider = useRef();
 	const [state, setState] = useState({
 		beforeSteps: [
-			"Install swagger or other tools",
-			"Write long specs/yml for API description, query params, headers, body",
-			"Write examples",
-			"Repeat 1, 2, 3 for all API's",
-			"Deploy",
-			"Ready to view"
+			"Add Swagger to every service",
+			"Write specs by hand",
+			"Write MCP tools by hand",
+			"Redo it on every change",
+			"Still out of date"
 		],
 		socialsArr: [
 			{ name: "Twitter", logo: "/twitter-logo.png", url: "#" },
@@ -28,7 +27,7 @@ export default function Home() {
 			{ name: "Threads", logo: "/threads-logo.png", url: "https://openinapp.co/iamxd" },
 			{ name: "Linkedin", logo: "/linkedin-logo.png", url: "#" }
 		],
-		afterSteps: ["Install & integrate the middleware", "Ready  to view"],
+		afterSteps: ["Run one command", "Docs and MCP tools, always current"],
 		mailTo: "manage.granthai@gmail.com",
 		apisCount: 5
 	});
@@ -48,10 +47,10 @@ export default function Home() {
 	return (
 		<>
 			<Head>
-				<title>Granth Ai - Automate documentation</title>
+				<title>GranthAi - API docs and MCP tools from real traffic</title>
 				<meta
 					name="description"
-					content="Simplify your API documentation process today and focus on what you love—coding!"
+					content="One command. Swagger docs and MCP tools for any backend, built from real traffic."
 				/>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
@@ -68,17 +67,20 @@ export default function Home() {
 							<img src={"/granthai-logo.svg"} />
 						</div>
 						<div className={styles.header}>
-							Automate <code>API</code> documentation
+							Make your backend server <code>AI</code> ready
 						</div>
 						<div className={styles.subHeader}>
-							Maximize developer productivity with our backend agnostic API documentation tool.
+							Swagger docs and MCP tools, built from real traffic. No code changes.
+						</div>
+						<div className={styles.command}>
+							<span>$</span> npx granthai-agent --target 8000
 						</div>
 						<div className={styles.seperator}></div>
 						<div className={styles.callToAction} onClick={handleClick}>
-							Signup now
+							Sign up
 						</div>
 						<div className={styles.supportedTech}>
-							<div>Supports </div>
+							<div>Any language. Any framework.</div>
 							<img src={"/js-logo.svg"} />
 							<img src={"/py-logo.svg"} />
 							<img src={"/java-logo.svg"} />
@@ -100,7 +102,7 @@ export default function Home() {
 				<ScrollSection /> */}
 				<div className={styles.beforeAfter}>
 					<div className={styles.before}>
-						<div className={styles.title}>Before GranthAi (5 steps) 😫</div>
+						<div className={styles.title}>The old way 😫</div>
 						{state.beforeSteps.map((step, idx) => (
 							<div className={styles.step}>
 								<div className={styles.bullet}>
@@ -111,7 +113,7 @@ export default function Home() {
 						))}
 					</div>
 					<div className={styles.after}>
-						<div className={styles.title}>After GranthAi (1 step) 😊</div>
+						<div className={styles.title}>With GranthAi 😊</div>
 						{state.afterSteps.map((step, idx) => (
 							<div className={styles.step}>
 								<div className={styles.bullet}>
@@ -201,7 +203,7 @@ export default function Home() {
 
 				<div className={styles.lastSection}>
 					<div className={styles.contactUs}>
-						<div className={styles.title2}>Contact us?</div>
+						<div className={styles.title2}>Talk to us</div>
 						<div>
 							<a target="_blank" href={`https://openinapp.co/24jtf`}>
 								{state.mailTo}
@@ -209,7 +211,7 @@ export default function Home() {
 						</div>
 					</div>
 					<div className={styles.socials}>
-						<div className={styles.title2}>Join us on social media?</div>
+						<div className={styles.title2}>Follow us</div>
 						<div className={styles.socialIcons}>
 							{state.socialsArr.map((acc) => (
 								<img onClick={() => handleSocialClick(acc.url)} src={acc.logo} />
