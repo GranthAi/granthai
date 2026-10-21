@@ -21,7 +21,22 @@ function toolNameFor(method, path) {
 	return `${method}_${slug || "root"}`.slice(0, 64);
 }
 
-function buildTools(spec) {
+// "requires a Bearer token" style hint, so an agent knows why a call may answer 401
+function authHint(spec, operation) {
+	const security = operation.security;
+	if (!security || security.length === 0 || security.some((requirement) => Object.keys(requirement).length === 0)) return "";
+	const schemes = (spec.components && spec.components.securitySchemes) || {};
+	const names = security.map((requirement) => {
+		const scheme = schemes[Object.keys(requirement)[0]] || {};
+		if (scheme.scheme === "bearer") return "a Bearer token";
+		if (scheme.scheme === "basic") return "Basic auth";
+		if (scheme.in === "cookie") return `the ${scheme.name} session cookie`;
+		return `the ${scheme.name} ${scheme.in === "query" ? "query parameter" : "header"}`;
+	});
+	return ` (requires ${[...new Set(names)].join(" or ")})`;
+}
+
+function buildTools(spec, { includeAuthTools = false } = {}) {
 	const tools = [];
 	const used = new Set();
 
@@ -29,6 +44,8 @@ function buildTools(spec) {
 		for (const method of HTTP_METHODS) {
 			const operation = spec.paths[path][method];
 			if (!operation) continue;
+			// Logins need a person (passwords, OTPs, browser redirects), so they aren't agent tools by default
+			if (operation["x-granthai-login"] && !includeAuthTools) continue;
 
 			let name = toolNameFor(method, path);
 			for (let i = 2; used.has(name); i++) {
@@ -53,7 +70,7 @@ function buildTools(spec) {
 
 			tools.push({
 				name,
-				description: operation.summary || `${method.toUpperCase()} ${path}`,
+				description: (operation.summary || `${method.toUpperCase()} ${path}`) + authHint(spec, operation),
 				inputSchema: { type: "object", properties, ...(required.length ? { required } : {}) },
 				_operation: { method, path, parameters: operation.parameters || [], bodyContentType }
 			});
@@ -135,9 +152,9 @@ async function handleMessage(message, ctx) {
 		case "ping":
 			return rpcResult(id, {});
 		case "tools/list":
-			return rpcResult(id, { tools: buildTools(ctx.spec).map(({ _operation, ...tool }) => tool) });
+			return rpcResult(id, { tools: buildTools(ctx.spec, ctx).map(({ _operation, ...tool }) => tool) });
 		case "tools/call": {
-			const tool = buildTools(ctx.spec).find((t) => t.name === params.name);
+			const tool = buildTools(ctx.spec, ctx).find((t) => t.name === params.name);
 			if (!tool) return rpcError(id, -32602, `Unknown tool: ${params.name}`);
 			return rpcResult(id, await callTool(tool, params.arguments || {}, ctx));
 		}
@@ -181,7 +198,7 @@ function sendJson(res, status, body, headers = {}) {
 	res.end(JSON.stringify(body));
 }
 
-async function handleMcpRequest(req, res, { spec, origin, allowedOrigins = [] }) {
+async function handleMcpRequest(req, res, { spec, origin, allowedOrigins = [], includeAuthTools = false }) {
 	// Protects against DNS rebinding as required by the Streamable HTTP transport spec
 	if (!isOriginAllowed(req, allowedOrigins)) {
 		return sendJson(res, 403, rpcError(null, -32000, "Origin not allowed"));
@@ -203,7 +220,7 @@ async function handleMcpRequest(req, res, { spec, origin, allowedOrigins = [] })
 	for (const name of FORWARDED_HEADERS) {
 		if (req.headers[name]) forwardedHeaders[name] = req.headers[name];
 	}
-	const ctx = { spec, origin, forwardedHeaders };
+	const ctx = { spec, origin, forwardedHeaders, includeAuthTools };
 
 	const messages = Array.isArray(payload) ? payload : [payload];
 	const responses = (await Promise.all(messages.map((message) => handleMessage(message, ctx)))).filter(Boolean);

@@ -72,6 +72,7 @@ function createAgent({
 	publicUrl,
 	mcp = true,
 	mcpAllowedOrigins = [],
+	mcpAuthTools = false,
 	maxBody = DEFAULT_MAX_BODY,
 	onError = (err) => console.warn(`[granthai] ${err.message}`)
 }) {
@@ -127,7 +128,12 @@ function createAgent({
 			return res.end(JSON.stringify(recorder.spec));
 		}
 		if (route === "/mcp" && mcp) {
-			return handleMcpRequest(req, res, { spec: recorder.spec, origin: targetUrl.origin, allowedOrigins: mcpAllowedOrigins }).catch((err) => {
+			return handleMcpRequest(req, res, {
+				spec: recorder.spec,
+				origin: targetUrl.origin,
+				allowedOrigins: mcpAllowedOrigins,
+				includeAuthTools: mcpAuthTools
+			}).catch((err) => {
 				onError(err);
 				if (!res.headersSent) res.writeHead(500);
 				res.end();

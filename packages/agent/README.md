@@ -28,6 +28,7 @@ Needs Node 18.17+ where the agent runs. Your app can be written in anything.
 | `-o, --out` | `./granthai.openapi.json` | Spec file, reloaded on restart |
 | `--route` | | Path template, repeatable: `"/users/{username}"`, `"/files/{path*}"`, or a prefix `"/repos/{owner}/{repo}/**"` |
 | `--prefix` | `/_granthai` | Where the agent's own pages live |
+| `--mcp-auth-tools` | | Also expose login/OTP endpoints as MCP tools |
 | `--no-mcp` | | Disable the MCP endpoint |
 
 Run `npx granthai-agent --help` for all options.
@@ -39,6 +40,17 @@ claude mcp add --transport http my-api http://localhost:4000/_granthai/mcp
 ```
 
 Each endpoint becomes a tool (`GET /orders/{orderId}` → `get_orders_orderId`). `Authorization`, `Cookie`, CSRF and `X-API-Key` headers are forwarded to your API.
+
+## Authentication
+
+The agent works out how your API authenticates from its traffic and documents it. It detects:
+
+- **Credentials:** Bearer tokens (JWT or not), Basic auth, API-key headers and query parameters, and session cookies
+- **Logins:** password logins (JSON or HTML forms), sign-ups, login pages, OTP send and verify, and OAuth sign-in (e.g. Google)
+
+In the docs you get an **Authentication** summary at the top, a lock on endpoints that need credentials, and an Authorize button. An endpoint counts as public once it has answered without credentials.
+
+MCP tools say which credential they need. Login endpoints are left out of the tools, because passwords and OTPs should come from a person, not the model. Credential values are never stored.
 
 ## Examples
 

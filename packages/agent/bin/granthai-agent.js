@@ -25,6 +25,7 @@ Options
       --public-url <url>    URL clients use to reach the agent, written to the spec's servers
       --max-body <bytes>    Largest request/response body inspected (default 1048576)
       --mcp-origin <url>    Browser origin allowed to call the MCP endpoint, repeatable
+      --mcp-auth-tools      Also expose login/OTP endpoints as MCP tools (hidden by default)
       --no-mcp              Don't serve the MCP endpoint
   -h, --help                Show this help
   -v, --version             Show the version
@@ -55,6 +56,7 @@ try {
 			"public-url": { type: "string" },
 			"max-body": { type: "string", default: "1048576" },
 			"mcp-origin": { type: "string", multiple: true, default: [] },
+			"mcp-auth-tools": { type: "boolean", default: false },
 			help: { type: "boolean", short: "h" },
 			version: { type: "boolean", short: "v" }
 		},
@@ -93,6 +95,7 @@ try {
 		publicUrl: options["public-url"],
 		mcp: options.mcp,
 		mcpAllowedOrigins: options["mcp-origin"],
+		mcpAuthTools: options["mcp-auth-tools"],
 		maxBody
 	});
 } catch (err) {

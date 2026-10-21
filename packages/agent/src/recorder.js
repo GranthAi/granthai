@@ -6,6 +6,7 @@ const zlib = require("zlib");
 const { STATUS_CODES } = require("http");
 const { inferSchema, mergeSchema } = require("./schema");
 const { createPathTemplater, classifySegment } = require("./pathTemplate");
+const { createAuthDetector } = require("./auth");
 
 const SAVE_DELAY_MS = 1000;
 const NON_API_TYPES = /^(text\/(html|css|javascript|event-stream)|application\/(javascript|wasm)|image\/|font\/|audio\/|video\/)/;
@@ -90,6 +91,7 @@ function createRecorder({ title, specFile, routes = [], publicUrl } = {}) {
 	if (title) spec.info.title = title;
 	if (publicUrl) spec.servers = [{ url: publicUrl }];
 	const templatePath = createPathTemplater(routes);
+	const auth = createAuthDetector(spec);
 	let saveTimer = null;
 
 	function saveNow() {
@@ -114,17 +116,34 @@ function createRecorder({ title, specFile, routes = [], publicUrl } = {}) {
 		saveTimer.unref();
 	}
 
+	function decodedText(body, headers, truncated) {
+		if (!body || body.length === 0 || truncated) return null;
+		try {
+			return decodeBody(body, headers["content-encoding"]).toString("utf8");
+		} catch (err) {
+			return null;
+		}
+	}
+
 	// exchange: { method, url, reqHeaders, reqBody, reqTruncated, status, resHeaders, resBody, resTruncated }
 	function record(exchange) {
 		const method = exchange.method.toUpperCase();
 		const status = exchange.status;
 		const reqType = baseType(exchange.reqHeaders["content-type"]);
 		const resType = baseType(exchange.resHeaders["content-type"]);
-		if (!isApiExchange({ method, status, resType })) return false;
+		if (method === "OPTIONS" || method === "HEAD" || status === 101) return false;
 
 		const url = new URL(exchange.url, "http://granthai.local");
 		const { template, params } = templatePath(url.pathname);
 		const key = method.toLowerCase();
+		const reqText = decodedText(exchange.reqBody, exchange.reqHeaders, exchange.reqTruncated);
+		const resText = decodedText(exchange.resBody, exchange.resHeaders, exchange.resTruncated);
+
+		// Auth is learned from every exchange, including login pages and redirects that aren't API operations
+		const analysis = auth.analyze({ ...exchange, method, template, reqType, resType, reqText, resText });
+		auth.describe();
+		scheduleSave();
+		if (!isApiExchange({ method, status, resType }) && !analysis.login) return false;
 
 		// A 404/405 must not invent new endpoints (scanners, typos), only describe known ones
 		const known = spec.paths[template] && spec.paths[template][key];
@@ -142,9 +161,9 @@ function createRecorder({ title, specFile, routes = [], publicUrl } = {}) {
 			upsertParam(operation, { name, in: "query", schema: { type: allIntegers ? "integer" : "string" } });
 		}
 
-		if (exchange.reqBody && exchange.reqBody.length > 0 && reqType && !exchange.reqTruncated) {
+		if (reqText !== null && reqType) {
 			try {
-				const schema = bodySchema(decodeBody(exchange.reqBody, exchange.reqHeaders["content-encoding"]), reqType);
+				const schema = bodySchema(Buffer.from(reqText), reqType);
 				operation.requestBody = operation.requestBody || { required: false, content: {} };
 				const media = operation.requestBody.content[reqType];
 				operation.requestBody.content[reqType] = { schema: mergeSchema(media && media.schema, schema) };
@@ -154,9 +173,10 @@ function createRecorder({ title, specFile, routes = [], publicUrl } = {}) {
 		}
 
 		const response = (operation.responses[status] = operation.responses[status] || { description: STATUS_CODES[status] || "" });
-		if (exchange.resBody && exchange.resBody.length > 0 && resType && !exchange.resTruncated) {
+		// Login forms answer with pages and redirects: document the status, not the HTML
+		if (resText !== null && resType && !NON_API_TYPES.test(resType)) {
 			try {
-				const schema = bodySchema(decodeBody(exchange.resBody, exchange.resHeaders["content-encoding"]), resType);
+				const schema = bodySchema(Buffer.from(resText), resType);
 				response.content = response.content || {};
 				const media = response.content[resType];
 				response.content[resType] = { schema: mergeSchema(media && media.schema, schema) };
@@ -165,7 +185,7 @@ function createRecorder({ title, specFile, routes = [], publicUrl } = {}) {
 			}
 		}
 
-		scheduleSave();
+		auth.applyToOperation(operation, analysis, status);
 		return true;
 	}
 
