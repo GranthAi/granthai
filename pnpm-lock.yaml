@@ -145,6 +145,8 @@ importers:
         specifier: ^31.2.2
         version: 31.4.0
 
+  packages/agent: {}
+
   packages/node:
     dependencies:
       mixpanel:
