@@ -33,8 +33,11 @@ function paramNameFor(previousSegment) {
 	return `${singular}Id`;
 }
 
-function compileRoute(template) {
+// "/repos/{owner}/{repo}/**" templates the prefix and leaves the rest of the path to the heuristics
+function compileRoute(route) {
 	const names = [];
+	const prefix = route.endsWith("/**");
+	const template = prefix ? route.slice(0, -3) : route;
 	const source = template
 		.split("/")
 		.map((segment) =>
@@ -45,7 +48,30 @@ function compileRoute(template) {
 			})
 		)
 		.join("/");
-	return { template: template.replace(/\{(\w+)\*\}/g, "{$1}"), names, regex: new RegExp(`^${source}/?$`) };
+	return {
+		template: template.replace(/\{(\w+)\*\}/g, "{$1}"),
+		names,
+		prefix,
+		regex: new RegExp(prefix ? `^${source}(/.*)?$` : `^${source}/?$`)
+	};
+}
+
+// Replaces identifier-looking segments with {params} named after the segment before them
+function templateSegments(rawPath, params, used, previous = "") {
+	return rawPath
+		.split("/")
+		.map((segment, i, all) => {
+			const value = safeDecode(segment);
+			const schema = value && classifySegment(value);
+			if (!schema) return segment;
+
+			let name = paramNameFor(safeDecode(i > 0 ? all[i - 1] : previous));
+			for (let n = 2; used.has(name); n++) name = `${name.replace(/\d+$/, "")}${n}`;
+			used.add(name);
+			params.push({ name, value, schema });
+			return `{${name}}`;
+		})
+		.join("/");
 }
 
 function createPathTemplater(routes = []) {
@@ -59,23 +85,17 @@ function createPathTemplater(routes = []) {
 				const value = safeDecode(match[i + 1]);
 				return { name, value, schema: classifySegment(value) || { type: "string" } };
 			});
-			return { template: route.template, params };
+			const rest = route.prefix ? match[route.names.length + 1] || "" : "";
+			if (!rest) return { template: route.template, params };
+
+			const previous = route.template.split("/").pop();
+			const restTemplate = templateSegments(rest, params, new Set(route.names), /^\{/.test(previous) ? "" : previous);
+			return { template: route.template + restTemplate, params };
 		}
 
 		const params = [];
-		const used = new Set();
-		const segments = rawPath.split("/").map((segment, i, all) => {
-			const value = safeDecode(segment);
-			const schema = value && classifySegment(value);
-			if (!schema) return segment;
-
-			let name = paramNameFor(safeDecode(all[i - 1] || ""));
-			for (let n = 2; used.has(name); n++) name = `${name.replace(/\d+$/, "")}${n}`;
-			used.add(name);
-			params.push({ name, value, schema });
-			return `{${name}}`;
-		});
-		return { template: segments.join("/") || "/", params };
+		const template = templateSegments(rawPath, params, new Set());
+		return { template: template || "/", params };
 	};
 }
 

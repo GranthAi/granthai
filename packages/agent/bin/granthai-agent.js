@@ -18,7 +18,9 @@ Options
       --title <title>       Title of the generated documentation
   -o, --out <file>          Where the spec is saved and reloaded from (default ./granthai.openapi.json)
       --route <template>    Path template to use for matching requests, repeatable,
-                            e.g. --route "/files/{path*}" --route "/users/{username}"
+                            e.g. --route "/users/{username}" --route "/files/{path*}"
+                            End with /** to template a prefix and auto-detect the rest:
+                            --route "/repos/{owner}/{repo}/**"
       --prefix <path>       Where the agent serves its own pages (default /_granthai)
       --public-url <url>    URL clients use to reach the agent, written to the spec's servers
       --max-body <bytes>    Largest request/response body inspected (default 1048576)

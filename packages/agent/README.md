@@ -26,7 +26,7 @@ Needs Node 18.17+ where the agent runs. Your app can be written in anything.
 | `--host` | `127.0.0.1` | Use `0.0.0.0` in containers |
 | `--title` | `API Documentation` | Docs title |
 | `-o, --out` | `./granthai.openapi.json` | Spec file, reloaded on restart |
-| `--route` | | Path template, repeatable: `--route "/users/{username}"`, `--route "/files/{path*}"` |
+| `--route` | | Path template, repeatable: `"/users/{username}"`, `"/files/{path*}"`, or a prefix `"/repos/{owner}/{repo}/**"` |
 | `--prefix` | `/_granthai` | Where the agent's own pages live |
 | `--no-mcp` | | Disable the MCP endpoint |
 
@@ -39,6 +39,14 @@ claude mcp add --transport http my-api http://localhost:4000/_granthai/mcp
 ```
 
 Each endpoint becomes a tool (`GET /orders/{orderId}` → `get_orders_orderId`). `Authorization`, `Cookie`, CSRF and `X-API-Key` headers are forwarded to your API.
+
+## Examples
+
+Real open-source apps, run from their Docker images, with step-by-step READMEs:
+
+- [Gitea (Go)](https://github.com/GranthAi/granthai/tree/main/packages/agent/examples/gitea-go)
+- [Meilisearch (Rust)](https://github.com/GranthAi/granthai/tree/main/packages/agent/examples/meilisearch-rust)
+- [Spring PetClinic REST (Java)](https://github.com/GranthAi/granthai/tree/main/packages/agent/examples/petclinic-java)
 
 ## Good to know
 
